@@ -1,0 +1,50 @@
+[gd_scene load_steps=4 format=3 uid="uid://bvd2p8pltcbq3wvj"]
+
+[ext_resource type="Script" path="res://scripts/game_scene.gd"]
+[ext_resource type="Script" path="res://scripts/player_controller.gd"]
+[ext_resource type="Script" path="res://scripts/room_builder.gd"]
+
+[node name="Game" type="Node3D"]
+script = ExtResource("res://scripts/game_scene.gd")
+
+[node name="Room" type="Node3D" parent="."]
+script = ExtResource("res://scripts/room_builder.gd")
+
+[node name="Player" type="CharacterBody3D" parent="."]
+script = ExtResource("res://scripts/player_controller.gd")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Player"]
+
+[node name="InteractionRaycast" type="RayCast3D" parent="Player"]
+
+[node name="InteractionPrompt" type="Label" parent="Player"]
+anchor_left = 0.5
+anchor_top = 0.5
+offset_left = -50.0
+offset_top = 50.0
+offset_right = 50.0
+offset_bottom = 80.0
+text = "Presiona E para recoger"
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+script = ExtResource("res://scripts/ui_layer.gd")
+
+[node name="ComputerScreen" type="Control" parent="UILayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+visible = false
+
+[node name="InteractionPrompt" type="Label" parent="UILayer"]
+anchor_left = 0.5
+anchor_top = 0.1
+offset_left = -100.0
+offset_top = -10.0
+offset_right = 100.0
+offset_bottom = 20.0
+text = "Interacción disponible"
+visible = false
+alignment = HORIZONTAL_ALIGNMENT_CENTER
+
+[node name="Desk" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.8, -1)

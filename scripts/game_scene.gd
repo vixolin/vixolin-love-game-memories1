@@ -1,1 +1,169 @@
-extends Node3D\n\n# Game Scene - Escena principal del juego\n# Gestiona la habitación, cinematica de inicio y lógica general\n\nclass_name GameScene\n\n# Referencias\nvar game_manager: GameManager\nvar player: CharacterBody3D\nvar animation_player: AnimationPlayer\n\n# Estado\nvar is_intro_playing: bool = true\nvar camera: Camera3D\n\nfunc _ready() -> void:\n\tgame_manager = get_node(\"/root/GameManager\")\n\tplayer = get_node(\"Player\")\n\tcamera = get_node(\"Player/Head/Camera3D\")\n\tanimation_player = get_node(\"AnimationPlayer\")\n\t\n\t# Desactivar movimiento durante la intro\n\tplayer.set_physics_process(false)\n\t\n\t# Reproducir cinematica de inicio\n\tplay_intro_cinematic()\n\nfunc play_intro_cinematic() -> void:\n\t# Cinematica: despertar en la cama\n\tprint(\"Starting intro cinematic...\")\n\t\n\t# 1. Efectos de despertamiento (parpadeo)\n\tvar tween = create_tween()\n\ttween.set_parallel(true)\n\t\n\t# Animación de despertar - parpadeo\n\tfor i in range(3):\n\t\ttween.tween_callback(func(): apply_blink_effect(true))\n\t\ttween.tween_interval(0.2)\n\t\ttween.tween_callback(func(): apply_blink_effect(false))\n\t\ttween.tween_interval(0.3)\n\t\n\t# Esperar a que termine el parpadeo\n\tawait tween.finished\n\t\n\t# 2. Mostrar el desorden gradualmente\n\t# (Transición de visión borrosa a clara)\n\tshow_blurry_vision_transition()\n\t\n\t# 3. Esperar un momento\n\tawait get_tree().create_timer(2.0).timeout\n\t\n\t# 4. Mostrar el texto de inicio\n\tshow_intro_text()\n\t\n\t# 5. Esperar antes de permitir movimiento\n\tawait get_tree().create_timer(3.0).timeout\n\t\n\t# 6. Permitir movimiento\n\tplayer.set_physics_process(true)\n\tis_intro_playing = false\n\t\n\t# 7. Desbloquear la primera memoria como tutorial\n\tunlock_first_memory()\n\nfunc apply_blink_effect(blink_closed: bool) -> void:\n\t# Efecto de parpadeo - oscurecer la pantalla\n\tvar black_overlay = get_tree().root.get_node_or_null(\"BlackOverlay\")\n\tif not black_overlay:\n\t\tblack_overlay = ColorRect.new()\n\t\tblack_overlay.name = \"BlackOverlay\"\n\t\tblack_overlay.color = Color.BLACK\n\t\tblack_overlay.anchor_right = 1.0\n\t\tblack_overlay.anchor_bottom = 1.0\n\t\tblack_overlay.z_index = 1000\n\t\tget_tree().root.add_child(black_overlay)\n\t\n\tif blink_closed:\n\t\tblack_overlay.modulate.a = 1.0\n\telse:\n\t\tblack_overlay.modulate.a = 0.0\n\nfunc show_blurry_vision_transition() -> void:\n\t# Transición de visión borrosa a clara\n\tvar blur_material = StandardMaterial3D.new()\n\t# Aquí irían efectos de blur que se desvanecen\n\tprint(\"Vision becoming clear...\")\n\nfunc show_intro_text() -> void:\n\t# Mostrar texto inicial\n\tvar label = Label.new()\n\tlabel.text = \"Vaya... qué desastre. Debo ordenar este lugar.\"\n\tlabel.add_theme_font_size_override(\"font_size\", 32)\n\tlabel.anchor_left = 0.5\n\tlabel.anchor_top = 0.5\n\tlabel.anchor_right = 0.5\n\tlabel.anchor_bottom = 0.5\n\tlabel.offset_left = -300\n\tlabel.offset_top = -50\n\tlabel.offset_right = 300\n\tlabel.offset_bottom = 50\n\tlabel.modulate.a = 0.0\n\tlabel.z_index = 999\n\t\n\tget_tree().root.add_child(label)\n\t\n\t# Fade in del texto\n\tvar tween = create_tween()\n\ttween.tween_property(label, \"modulate:a\", 1.0, 1.0)\n\ttween.tween_interval(2.5)\n\ttween.tween_property(label, \"modulate:a\", 0.0, 1.0)\n\t\n\tawait tween.finished\n\tlabel.queue_free()\n\nfunc unlock_first_memory() -> void:\n\t# Desbloquear el primer recuerdo como introducción\n\tprint(\"Unlocking first memory as introduction...\")\n\t# Aquí irá la lógica de desbloquear \"letter_first_meeting\"\n\tgame_manager.memory_system.unlock_memory(\"letter_first_meeting\")\n\t\n\t# Mostrar notificación\n\tshow_notification(\"Primera carta desbloqueada. Revisa el ordenador.\")\n\nfunc show_notification(text: String) -> void:\n\t# Mostrar notificación en pantalla\n\tvar notification = Label.new()\n\tnotification.text = text\n\tnotification.add_theme_font_size_override(\"font_size\", 20)\n\tnotification.anchor_left = 0.5\n\tnotification.anchor_top = 0.1\n\tnotification.anchor_right = 0.5\n\tnotification.anchor_bottom = 0.1\n\tnotification.modulate.a = 0.0\n\tnotification.z_index = 999\n\t\n\tget_tree().root.add_child(notification)\n\t\n\tvar tween = create_tween()\n\ttween.tween_property(notification, \"modulate:a\", 1.0, 0.5)\n\ttween.tween_interval(3.0)\n\ttween.tween_property(notification, \"modulate:a\", 0.0, 0.5)\n\t\n\tawait tween.finished\n\tnotification.queue_free()\n"
+extends Node3D
+
+# Game Scene - Lógica principal de la escena del juego
+# Gestiona cinemática de inicio, sistemas del juego, etc.
+
+class_name GameScene
+
+# Referencias
+@onready var player = $Player
+@onready var camera = player.get_node("Camera3D")
+@onready var ui_layer = $UILayer
+
+# Sistemas
+var game_manager: GameManager
+var collectible_system: CollectibleSystem
+var memory_system: MemorySystem
+var visual_effects: VisualEffects
+var audio_manager: AudioManager
+
+# Estado
+var startup_complete: bool = false
+var in_cutscene: bool = false
+
+func _ready() -> void:
+	# Inicializar sistemas
+	initialize_systems()
+	
+	# Construcción de la habitación
+	build_room()
+	
+	# Desactivar controles del jugador durante cinemática
+	player.set_physics_process(false)
+	
+	# Iniciar cinemática de despertar
+
+await startup_cinematic()
+	
+	# Activar controles
+	player.set_physics_process(true)
+
+func initialize_systems() -> void:
+	# Crear instancias de los sistemas
+	game_manager = GameManager.new()
+	collectible_system = CollectibleSystem.new()
+	memory_system = MemorySystem.new()
+	visual_effects = VisualEffects.new()
+	audio_manager = AudioManager.new()
+	
+	# Cargar estado del juego
+	game_manager.collectible_system = collectible_system
+	game_manager.memory_system = memory_system
+	# Conectar señales
+	collectible_system.item_collected.connect(_on_item_collected)
+
+memory_system.memory_unlocked.connect(_on_memory_unlocked)
+
+func build_room() -> void:
+	# Construcción de la habitación
+	# TODO: Implementar construcción detallada de la habitación
+	print("Room built successfully")
+
+func startup_cinematic() -> void:
+	# CINEMÁTICA DE DESPERTAR
+	in_cutscene = true
+	
+	# Paso 1: Parpadeo inicial (3 veces)
+	for i in range(3):
+		# Oscurecer
+		var fade_overlay = ColorRect.new()
+		fade_overlay.color = Color.BLACK
+		fade_overlay.anchor_right = 1.0
+		fade_overlay.anchor_bottom = 1.0
+		add_child(fade_overlay)
+		
+		var tween = create_tween()
+		tween.tween_property(fade_overlay, "modulate:a", 1.0, 0.3)
+		tween.tween_callback(func(): pass)
+		tween.tween_property(fade_overlay, "modulate:a", 0.0, 0.5)
+		
+		await tween.finished
+		fade_overlay.queue_free()
+		await get_tree().process_frame
+	
+	# Paso 2: Pausa con visión borrosa (2 segundos)
+	var blur_overlay = ColorRect.new()
+	blur_overlay.color = Color(0.5, 0.5, 0.5, 0.3)
+	blur_overlay.anchor_right = 1.0
+	blur_overlay.anchor_bottom = 1.0
+	add_child(blur_overlay)
+	
+	await get_tree().create_timer(2.0).timeout
+	
+	# Paso 3: Desvanecimiento de visión borrosa
+	var tween = create_tween()
+	tween.tween_property(blur_overlay, "modulate:a", 0.0, 1.0)
+	await tween.finished
+	blur_overlay.queue_free()
+	
+	# Paso 4: Mostrar texto de diálogo
+	show_dialog_text("Vaya... qué desastre. Debo ordenar este lugar.")
+	await get_tree().create_timer(2.5).timeout
+	
+	# Paso 5: Desbloquear primera carta automáticamente
+	unlock_first_memory()
+	
+	# Mostrar notificación
+	show_notification("Primera carta desbloqueada. Revisa el ordenador (Tab)")
+	await get_tree().create_timer(2.0).timeout
+	
+	in_cutscene = false
+	startup_complete = true
+
+func show_dialog_text(text: String) -> void:
+	# Mostrar texto de diálogo en la pantalla
+	var dialog_label = Label.new()
+	dialog_label.text = text
+	dialog_label.add_theme_font_size_override("font_size", 32)
+	dialog_label.anchor_left = 0.5
+	dialog_label.anchor_top = 0.5
+	dialog_label.offset_left = -200
+	dialog_label.offset_top = -50
+	dialog_label.custom_minimum_size = Vector2(400, 100)
+	dialog_label.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	dialog_label.add_theme_color_override("font_color", Color.WHITE)
+	add_child(dialog_label)
+	
+	var tween = create_tween()
+	tween.tween_property(dialog_label, "modulate:a", 1.0, 0.5)
+	tween.tween_callback(func(): pass)
+	tween.tween_property(dialog_label, "modulate:a", 0.0, 1.5)
+	
+	await tween.finished
+	dialog_label.queue_free()
+
+func show_notification(text: String) -> void:
+	# Mostrar notificación en la pantalla
+	var notif_label = Label.new()
+	notif_label.text = text
+	notif_label.add_theme_font_size_override("font_size", 24)
+	notif_label.anchor_top = 0.0
+	notif_label.anchor_left = 0.5
+	notif_label.offset_left = -250
+	notif_label.offset_top = 20
+	notif_label.custom_minimum_size = Vector2(500, 50)
+	notif_label.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	notif_label.add_theme_color_override("font_color", Color.YELLOW)
+	add_child(notif_label)
+	
+	var tween = create_tween()
+	tween.tween_property(notif_label, "modulate:a", 1.0, 0.3)
+	tween.tween_callback(func(): pass)
+	tween.tween_property(notif_label, "modulate:a", 0.0, 1.0)
+	
+	await tween.finished
+	notif_label.queue_free()
+
+func unlock_first_memory() -> void:
+	# Desbloquear la primera carta automáticamente
+	var first_memory = "letter_first_meeting"
+	memory_system.unlock_memory(first_memory)
+	game_manager.unlocked_memories.append(first_memory)
+
+func _on_item_collected(item_id: String, item_name: String) -> void:
+	# Cuando se recoge un objeto
+	show_notification("Recogiste: %s" % item_name)
+
+func _on_memory_unlocked(memory_id: String) -> void:
+	# Cuando se desbloquea una memoria
+	show_notification("¡Nueva carta desbloqueada!")
