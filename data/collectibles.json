@@ -1,0 +1,39 @@
+{
+  "collectibles": [
+    {
+      "id": "plushie_cat",
+      "name": "Peluche de Gato",
+      "description": "Un pequeño gato de peluche suave",
+      "unlock_memory": "letter_first_meeting",
+      "type": "plushie"
+    },
+    {
+      "id": "photo_beach",
+      "name": "Foto en la Playa",
+      "description": "Una fotografía especial de un momento compartido",
+      "unlock_memory": "letter_beach_day",
+      "type": "photo"
+    },
+    {
+      "id": "love_letter",
+      "name": "Carta de Amor",
+      "description": "Una carta escrita con el corazón",
+      "unlock_memory": "letter_confession",
+      "type": "letter"
+    },
+    {
+      "id": "rose",
+      "name": "Rosa Roja",
+      "description": "Una rosa eterna, símbolo del amor",
+      "unlock_memory": "letter_forever",
+      "type": "flower"
+    },
+    {
+      "id": "music_box",
+      "name": "Caja de Música",
+      "description": "Una caja que toca una melodía especial",
+      "unlock_memory": "letter_our_song",
+      "type": "music"
+    }
+  ]
+}

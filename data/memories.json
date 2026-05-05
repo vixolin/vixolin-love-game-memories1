@@ -1,0 +1,34 @@
+{
+  "memories": [
+    {
+      "id": "letter_first_meeting",
+      "title": "Nuestro Primer Encuentro",
+      "content": "Cuando te vi por primera vez, mi corazón supo que eras especial. Había algo en tu sonrisa que cambió todo para mí. Cada momento desde entonces ha sido un regalo.",
+      "unlock_item": "plushie_cat"
+    },
+    {
+      "id": "letter_beach_day",
+      "title": "Día en la Playa",
+      "content": "Esos momentos contigo bajo el sol son mis favoritos. Tu sonrisa lo ilumina todo. Quisiera volver a ese día una y otra vez, caminar de tu mano en la arena, perdernos en conversaciones infinitas.",
+      "unlock_item": "photo_beach"
+    },
+    {
+      "id": "letter_confession",
+      "title": "Mi Confesión",
+      "content": "Te amo más cada día. Eres mi razón de sonreír, mi paz y mi alegría. No imaginé que alguien pudiera ser tan importante en mi vida. Contigo me siento completo, entero, verdaderamente yo.",
+      "unlock_item": "love_letter"
+    },
+    {
+      "id": "letter_forever",
+      "title": "Para Siempre",
+      "content": "Quiero vivir contigo todos mis días, crear recuerdos eternos y amarte sin fin. Mi sueño es envejecer a tu lado, disfrutar de cada sunrise, cada sunset, cada momento contigo.",
+      "unlock_item": "rose"
+    },
+    {
+      "id": "letter_our_song",
+      "title": "Nuestra Canción",
+      "content": "Cada nota de esta melodía te representa. Hermosa, perfecta y para siempre mía. Espero que cuando la escuches, recuerdes este momento y sientas todo el amor que tengo en mi corazón.",
+      "unlock_item": "music_box"
+    }
+  ]
+}

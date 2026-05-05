@@ -1,0 +1,33 @@
+[gd_scene load_steps=2 format=3 uid="uid://bvnwyqk82hl4fvjp"]
+
+[ext_resource type="Script" path="res://scripts/game_manager.gd"]
+
+[node name="MainRoom" type="Node2D"]
+script = ExtResource("res://scripts/game_manager.gd")
+
+[node name="Background" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="ColorRect" type="ColorRect" parent="Background"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.95, 0.95, 0.95, 1)
+
+[node name="RoomEnvironment" type="Node2D" parent="."]
+
+[node name="Walls" type="Node2D" parent="RoomEnvironment"]
+
+[node name="Furniture" type="Node2D" parent="RoomEnvironment"]
+
+[node name="Collectibles" type="Node2D" parent="RoomEnvironment"]
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+layer = 1
+
+[node name="ComputerUI" type="Control" parent="UILayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="PlayerHands" type="Node2D" parent="."]
+
+[node name="Mirror" type="Node2D" parent="."]

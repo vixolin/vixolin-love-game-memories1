@@ -1,0 +1,24 @@
+[gd_resource type="ProjectSettings" format=3]
+
+config_version = 5
+
+[application]
+
+config/name="Love Game Memories"
+config/description="A heartfelt visual novel game expressing love through interactive memories"
+config/version="0.1.0"
+config/windows_native_icon="res://assets/icon.svg"
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+window/size/window_width_override=1920
+window/size/window_height_override=1080
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[rendering]
+
+renderer/rendering_method="mobile"
+textures/vram_compression/import_etc2_astc=true
